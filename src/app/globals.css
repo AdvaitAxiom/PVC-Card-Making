@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Card fonts.
+ *
+ * These are variable fonts, so every weight from Light to Black really is a
+ * different shape. Most fonts installed on a computer only carry regular and
+ * bold, which is why the other choices appear to do nothing with them.
+ */
+@font-face {
+  font-family: "Card Sans";
+  src: url("/fonts/inter-var.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Card Serif";
+  src: url("/fonts/source-serif-var.woff2") format("woff2-variations");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Card Mono";
+  src: url("/fonts/roboto-mono-var.woff2") format("woff2-variations");
+  font-weight: 100 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-slate-100 text-slate-900 antialiased;
+}
+
+/* Inlined template artwork always fills its card container. */
+.artwork-layer > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.card-surface {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.45);
+}
+
+.field-box {
+  outline: 1px dashed transparent;
+  transition: outline-color 120ms ease;
+}
+
+.editable .field-box:hover {
+  outline-color: rgba(52, 98, 246, 0.55);
+}
+
+.editable .field-box.is-selected {
+  outline: 1.5px solid #3462f6;
+  outline-offset: 0;
+}
+
+.field-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 1.5px solid #3462f6;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
+}
+
+.checker {
+  background-image:
+    linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
+    linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+  background-size: 16px 16px;
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0;
+}
+
+.input {
+  @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200;
+}
+
+.label {
+  @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.btn-primary {
+  @apply btn bg-brand-600 text-white shadow-sm hover:bg-brand-700;
+}
+
+.btn-secondary {
+  @apply btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-50;
+}
+
+.btn-ghost {
+  @apply btn text-slate-600 hover:bg-slate-100;
+}
+
+.btn-danger {
+  @apply btn border border-red-200 bg-white text-red-600 hover:bg-red-50;
+}
+
+.card-panel {
+  @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-sheet {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Sheets print at true size, never at the on-screen zoom. */
+  .sheet-zoom {
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .sheet-zoom > .print-page {
+    transform: none !important;
+  }
+
+  .print-page {
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .print-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .card-surface {
+    box-shadow: none !important;
+  }
+}
