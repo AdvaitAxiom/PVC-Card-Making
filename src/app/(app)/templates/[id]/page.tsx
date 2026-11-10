@@ -37,6 +37,7 @@ import {
 import CardCanvas from "@/components/CardCanvas";
 import ImageCropper from "@/components/ImageCropper";
 import StylePanel from "@/components/StylePanel";
+import TemplateImagePalette from "@/components/TemplateImagePalette";
 import { useConfirm } from "@/components/ConfirmDialog";
 import {
   CardTemplate,
@@ -52,7 +53,7 @@ import { sanitizeSvg } from "@/lib/render";
 import { countSvgText, extractTextFields, stripTextFromSvg } from "@/lib/import-text";
 import { readImageScaled } from "@/lib/image";
 import { arrowDelta, isTypingTarget, nudgeStep } from "@/lib/shortcuts";
-import { cx, downloadBlob, readFileAsText, round, slugKey, uid } from "@/lib/utils";
+import { cx, downloadBlob, makeField, readFileAsText, round, slugKey, uid } from "@/lib/utils";
 
 export default function TemplateDesignerPage() {
   const params = useParams<{ id: string }>();
@@ -310,6 +311,31 @@ export default function TemplateDesignerPage() {
       };
     });
     setSelectedId(field.id);
+  }
+
+  function addTemplateImage(label: string, dataUrl: string) {
+    if (!template) return;
+    const size = Math.min(20, template.widthMm, template.heightMm);
+    const field = makeField({
+      label,
+      key: uid("vehicle"),
+      type: "image",
+      side,
+      defaultValue: dataUrl,
+      layout: {
+        x: (template.widthMm - size) / 2,
+        y: (template.heightMm - size) / 2,
+        width: size,
+        height: size,
+        rotation: 0,
+      },
+      style: { imageFit: "contain" },
+    });
+    setTemplate((prev) => prev ? { ...prev, fields: [...prev.fields, field] } : prev);
+    setSide(side);
+    setSelectedId(field.id);
+    setPanel("details");
+    setShowProperties(true);
   }
 
   function duplicateField(fieldId: string) {
@@ -1022,6 +1048,8 @@ export default function TemplateDesignerPage() {
             </button>
           </div>
         </div>
+
+        <TemplateImagePalette onInsert={addTemplateImage} onError={setToast} />
 
         {showBulk ? (
           <div className="border-b border-slate-200 bg-slate-50 p-3">

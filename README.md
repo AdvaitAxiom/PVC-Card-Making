@@ -29,6 +29,7 @@ your own by dropping files in there.
 | **Undo anything** | **Ctrl+Z** steps back through moves, restyles and edits; **Ctrl+Y** puts them back. |
 | **Print an A4 sheet** | Lay many cards on one A4 page, choose fronts, backs or both, adjust how many fit across and down, the gaps and the margins, and print them all in one go. |
 | **Fixed template images** | Give an image box a picture in the designer (logo, emblem, hologram) and it appears on every card made from that template. |
+| **Vehicle image buttons** | Open **Details > Vehicle images** in the template designer and click any of the ten thumbnails to add it to the current front or back. The image is selected automatically: drag or resize it, or use **Properties** for size, opacity, rotation, fit and trimming. Duplicate, delete and undo/redo work as with other images. Original backgrounds are preserved; image bytes are embedded in saved templates, cards, prints, SVG/PNG exports and backups. |
 | **Print** | Print at exact CR80 size (85.6 × 54 mm), or on an A4 sheet with cut marks. |
 | **Export** | Download each side as a 300 DPI PNG or as a vector SVG. The fonts travel inside the file, so it looks the same anywhere. |
 | **Manage templates** | Add, edit, duplicate or delete templates. Upload new front/back SVG artwork at any time. |
