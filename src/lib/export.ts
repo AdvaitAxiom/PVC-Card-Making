@@ -78,6 +78,14 @@ function fieldToSvg(field: ResolvedField, raw: string): string {
 
   const parts: string[] = [];
 
+  if (field.type === "line") {
+    return (
+      `<g${rotate} opacity="${style.opacity}">` +
+      `<line x1="${x}" y1="${y + h / 2}" x2="${x + w}" y2="${y + h / 2}" ` +
+      `stroke="${escapeXml(style.color)}" stroke-width="${h}"/></g>`
+    );
+  }
+
   const hasFill = style.backgroundColor && style.backgroundColor !== "transparent";
   const hasStroke = style.borderWidth > 0 && style.borderColor !== "transparent";
   if (hasFill || hasStroke) {

@@ -5,6 +5,7 @@ import {
   EyeOff,
   Image as ImageIcon,
   Lock,
+  Minus,
   PenLine,
   QrCode,
   Trash2,
@@ -117,6 +118,8 @@ export default function LayerList({
                     >
                       {field.type === "image" ? (
                         <ImageIcon size={13} className="shrink-0 opacity-60" />
+                      ) : field.type === "line" ? (
+                        <Minus size={13} className="shrink-0 opacity-60" />
                       ) : (
                         <TypeIcon size={13} className="shrink-0 opacity-60" />
                       )}

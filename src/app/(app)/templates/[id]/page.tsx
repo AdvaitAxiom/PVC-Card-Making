@@ -17,6 +17,7 @@ import {
   Loader2,
   Lock,
   LockOpen,
+  Minus,
   PackagePlus,
   PanelLeftClose,
   PanelLeftOpen,
@@ -24,6 +25,7 @@ import {
   Redo2,
   Shapes,
   ShieldCheck,
+  SlidersHorizontal,
   Trash2,
   Type,
   Undo2,
@@ -71,6 +73,7 @@ export default function TemplateDesignerPage() {
   const [savingBuiltIn, setSavingBuiltIn] = useState(false);
   const [canSaveBuiltIn, setCanSaveBuiltIn] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
+  const [showProperties, setShowProperties] = useState(false);
   const [panel, setPanel] = useState<"info" | "artwork" | "details" | null>("details");
   const [cropFor, setCropFor] = useState<
     { id: string; src: string; aspect?: number } | null
@@ -281,13 +284,13 @@ export default function TemplateDesignerPage() {
       side,
       required: false,
       multiline: false,
-      placeholder: type === "image" ? "" : "Type here",
+      placeholder: type === "text" ? "Type here" : "",
       defaultValue: "",
       helpText: "",
       layout:
         type === "image"
           ? { x: 8, y: 14, width: 20, height: 25, rotation: 0 }
-          : { x: 10, y: 24, width: 45, height: 6, rotation: 0 },
+          : { x: 10, y: 24, width: 45, height: type === "line" ? 0.4 : 6, rotation: 0 },
       style: { ...DEFAULT_STYLE, imageFit: type === "image" ? "cover" : DEFAULT_STYLE.imageFit },
       locked: false,
     };
@@ -301,7 +304,7 @@ export default function TemplateDesignerPage() {
           {
             ...field,
             key: `field_${count}`,
-            label: type === "image" ? `Image ${count}` : `Detail ${count}`,
+            label: type === "image" ? `Image ${count}` : type === "line" ? `Line ${count}` : `Detail ${count}`,
           },
         ],
       };
@@ -686,6 +689,15 @@ export default function TemplateDesignerPage() {
         ) : null}
 
         <button
+          className="btn-secondary h-9 px-2 lg:hidden"
+          onClick={() => setShowProperties((open) => !open)}
+          aria-label="Toggle properties"
+          aria-expanded={showProperties}
+          aria-controls="template-properties"
+        >
+          <SlidersHorizontal size={16} />
+        </button>
+        <button
           className={cx(canSaveBuiltIn ? "btn-secondary" : "btn-primary", "h-9 text-xs")}
           onClick={saveToApp}
           title="Download this card as a file to put in the project yourself"
@@ -696,7 +708,7 @@ export default function TemplateDesignerPage() {
       </div>
 
       {/* Workspace */}
-      <div className="flex min-h-0 flex-1">
+      <div className="relative flex min-h-0 flex-1">
         {/* Tool rail */}
         <nav className="flex w-[68px] shrink-0 flex-col gap-1 border-r border-slate-200 bg-white p-2">
           {PANELS.map((tool) => {
@@ -743,6 +755,17 @@ export default function TemplateDesignerPage() {
           >
             <ImageIcon size={19} />
             Image
+          </button>
+          <button
+            onClick={() => {
+              addField("line");
+              setPanel("details");
+            }}
+            className="flex flex-col items-center gap-1 rounded-lg px-1 py-2.5 text-[10px] font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+            title="Add a line"
+          >
+            <Minus size={19} />
+            Line
           </button>
           <button
             onClick={() => {
@@ -964,7 +987,7 @@ export default function TemplateDesignerPage() {
           <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">
             Details on the {side}
           </p>
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="grid grid-cols-4 gap-1.5">
             <button
               className="btn-secondary flex-col gap-1 px-1 py-2 text-[10px]"
               onClick={() => addField("text")}
@@ -980,6 +1003,14 @@ export default function TemplateDesignerPage() {
             >
               <ImageIcon size={15} />
               Image
+            </button>
+            <button
+              className="btn-secondary flex-col gap-1 px-1 py-2 text-[10px]"
+              onClick={() => addField("line")}
+              title="Add a line"
+            >
+              <Minus size={15} />
+              Line
             </button>
             <button
               className="btn-secondary flex-col gap-1 px-1 py-2 text-[10px]"
@@ -1056,6 +1087,8 @@ export default function TemplateDesignerPage() {
                         ) : (
                           <ImageIcon size={13} className="shrink-0 text-slate-400" />
                         )
+                      ) : field.type === "line" ? (
+                        <Minus size={13} className="shrink-0 text-slate-400" />
                       ) : (
                         <Type size={13} className="shrink-0 text-slate-400" />
                       )}
@@ -1216,9 +1249,24 @@ export default function TemplateDesignerPage() {
         </main>
 
         {/* Properties */}
-        <aside className="hidden w-[300px] shrink-0 flex-col border-l border-slate-200 bg-white lg:flex">
+        <aside
+          id="template-properties"
+          className={cx(
+            "w-[300px] max-w-full shrink-0 flex-col border-l border-slate-200 bg-white lg:static lg:flex lg:shadow-none",
+            showProperties ? "absolute inset-y-0 right-0 z-20 flex shadow-xl" : "hidden",
+          )}
+        >
           <div className="shrink-0 border-b border-slate-200 px-3 py-2.5">
-            <h2 className="text-sm font-bold text-slate-900">Properties</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-bold text-slate-900">Properties</h2>
+              <button
+                className="btn-ghost p-1 lg:hidden"
+                onClick={() => setShowProperties(false)}
+                aria-label="Close properties"
+              >
+                <PanelLeftClose size={16} />
+              </button>
+            </div>
             <p className="text-[11px] text-slate-500">
               {selectedField ? "Adjust the selected detail." : "Pick a detail on the card."}
             </p>
@@ -1230,7 +1278,7 @@ export default function TemplateDesignerPage() {
             Detail settings
           </p>
           <label className="block">
-            <span className="label">Label shown in the form</span>
+            <span className="label">{selectedField.type === "line" ? "Line label" : "Label shown in the form"}</span>
             <input
               className="input py-1.5 text-sm"
               value={selectedField.label}
@@ -1271,12 +1319,22 @@ export default function TemplateDesignerPage() {
               <select
                 className="input py-1.5 text-sm"
                 value={selectedField.type}
-                onChange={(e) =>
-                  patchField(selectedField.id, { type: e.target.value as FieldType })
-                }
+                onChange={(e) => {
+                  const type = e.target.value as FieldType;
+                  patchField(selectedField.id, {
+                    type,
+                    ...(type === "line" ? {
+                      required: false,
+                      layout: { ...selectedField.layout, height: 0.4 },
+                    } : selectedField.type === "line" ? {
+                      layout: { ...selectedField.layout, height: type === "image" ? 25 : 6 },
+                    } : {}),
+                  });
+                }}
               >
                 <option value="text">Text</option>
                 <option value="image">Image</option>
+                <option value="line">Line</option>
               </select>
             </label>
           </div>
@@ -1303,7 +1361,7 @@ export default function TemplateDesignerPage() {
                 />
               </label>
             </>
-          ) : (
+          ) : selectedField.type === "image" ? (
             <div>
               <span className="label">Template image</span>
               <div className="flex items-center gap-2">
@@ -1368,7 +1426,7 @@ export default function TemplateDesignerPage() {
                   : "Upload a logo, emblem or hologram to show on every card. Leave it empty if each card needs its own photo."}
               </p>
             </div>
-          )}
+          ) : null}
           <label className="block">
             <span className="label">Help note</span>
             <input
@@ -1378,7 +1436,7 @@ export default function TemplateDesignerPage() {
             />
           </label>
           <div className="flex flex-wrap gap-4 pt-1">
-            <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+            {selectedField.type !== "line" ? <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">
               <input
                 type="checkbox"
                 className="h-4 w-4 accent-brand-600"
@@ -1388,7 +1446,7 @@ export default function TemplateDesignerPage() {
                 }
               />
               Required
-            </label>
+            </label> : null}
             {selectedField.type === "text" ? (
               <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">
                 <input

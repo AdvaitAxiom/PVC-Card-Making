@@ -35,6 +35,7 @@ your own by dropping files in there.
 | **Keep a card for good** | **Keep for good** in the designer writes your card into `card-templates/`, so clearing your browser cannot lose it. Available when you run the app on your own computer. |
 | **Import text from artwork** | If your SVG still has real text in it, one click turns every word into an editable, draggable detail — same position, font, size and colour. |
 | **Add details in bulk** | Press **List** in the designer, paste your labels one per line, and get a box for each. |
+| **Draw lines** | In the template designer's **Details**, choose **Line**. Set its length, line width, colour and angle, or drag either endpoint to stretch and turn it while the other end stays fixed. Lines are saved with the template and included in prints and exports. |
 | **Backup** | Download everything to one file and restore it on another computer — either merged into what you have, or replacing it. |
 
 ---

@@ -136,6 +136,7 @@ export default function StylePanel({
   }
 
   const isText = field.type === "text";
+  const isLine = field.type === "line";
   const style = field.style;
 
   return (
@@ -163,19 +164,20 @@ export default function StylePanel({
           <NumberInput label="X" value={field.layout.x} onChange={(x) => onLayoutChange({ x })} />
           <NumberInput label="Y" value={field.layout.y} onChange={(y) => onLayoutChange({ y })} />
           <NumberInput
-            label="Width"
+            label={isLine ? "Length" : "Width"}
             value={field.layout.width}
-            min={1}
-            onChange={(width) => onLayoutChange({ width })}
+            min={isLine ? 0.1 : 1}
+            onChange={(width) => onLayoutChange({ width: isLine ? Math.max(0.1, width) : width })}
           />
           <NumberInput
-            label="Height"
+            label={isLine ? "Line width" : "Height"}
             value={field.layout.height}
-            min={1}
-            onChange={(height) => onLayoutChange({ height })}
+            min={isLine ? 0.1 : 1}
+            step={isLine ? 0.1 : 0.5}
+            onChange={(height) => onLayoutChange({ height: isLine ? Math.max(0.1, height) : height })}
           />
           <NumberInput
-            label="Rotation"
+            label={isLine ? "Angle" : "Rotation"}
             suffix="°"
             step={1}
             value={field.layout.rotation}
@@ -338,6 +340,17 @@ export default function StylePanel({
             onChange={(color) => onStyleChange({ color })}
           />
         </div>
+      ) : isLine ? (
+        <div className="space-y-3 p-4">
+          <ColourField
+            label="Line colour"
+            value={style.color}
+            onChange={(color) => onStyleChange({ color })}
+          />
+          <p className="text-xs leading-relaxed text-slate-500">
+            Drag either endpoint on the card to stretch and turn the line. The other end stays in place.
+          </p>
+        </div>
       ) : (
         <div className="space-y-3 p-4">
           <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Image</p>
@@ -358,7 +371,7 @@ export default function StylePanel({
         </div>
       )}
 
-      <div className="space-y-3 p-4">
+      {!isLine ? <div className="space-y-3 p-4">
         <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Box</p>
         <div className="grid grid-cols-2 gap-2.5">
           <NumberInput
@@ -392,7 +405,7 @@ export default function StylePanel({
             allowNone
           />
         </div>
-      </div>
+      </div> : null}
 
       {extra ? <div className="p-4">{extra}</div> : null}
     </div>

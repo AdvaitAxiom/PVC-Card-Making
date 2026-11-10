@@ -74,7 +74,11 @@ export default function CardDetailsForm({
                       </button>
                     </div>
 
-                    {field.type === "image" ? (
+                    {field.type === "line" ? (
+                      <p className="text-[11px] text-slate-400">
+                        Select the line to adjust its width, colour or angle.
+                      </p>
+                    ) : field.type === "image" ? (
                       <div className="flex items-center gap-2">
                         {value || field.defaultValue ? (
                           // eslint-disable-next-line @next/next/no-img-element

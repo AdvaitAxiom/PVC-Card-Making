@@ -1,13 +1,16 @@
 export type Side = "front" | "back";
 
-export type FieldType = "text" | "image";
+export type FieldType = "text" | "image" | "line";
 
 export type TextAlign = "left" | "center" | "right";
 export type VerticalAlign = "top" | "middle" | "bottom";
 export type TextTransform = "none" | "uppercase" | "lowercase" | "capitalize";
 export type ImageFit = "cover" | "contain" | "fill";
 
-/** All geometry is expressed in millimetres, measured from the top-left of the card. */
+/**
+ * Geometry is in millimetres, measured from the card's top-left.
+ * For lines, width is length and height is stroke width.
+ */
 export interface FieldLayout {
   x: number;
   y: number;

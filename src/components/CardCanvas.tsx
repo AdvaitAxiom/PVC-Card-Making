@@ -16,12 +16,15 @@ import {
   imageStyle,
   prepareArtwork,
   resolveFields,
+  stretchLine,
   textStyle,
 } from "@/lib/render";
 import { clamp, cx, round } from "@/lib/utils";
 
 type DragMode =
   | "move"
+  | "line-start"
+  | "line-end"
   | "nw"
   | "ne"
   | "sw"
@@ -137,6 +140,18 @@ export default function CardCanvas({
       if (drag.mode === "move") {
         next.x = clamp(start.x + dxMm, -start.width / 2, template.widthMm - start.width / 2);
         next.y = clamp(start.y + dyMm, -start.height / 2, template.heightMm - start.height / 2);
+      } else if (drag.mode === "line-start" || drag.mode === "line-end") {
+        let dx = dxMm;
+        let dy = dyMm;
+        if (event.shiftKey) {
+          dx = Math.round(dx * 2) / 2;
+          dy = Math.round(dy * 2) / 2;
+        }
+        applyLayout(
+          drag.fieldId,
+          stretchLine(start, drag.mode === "line-start" ? "start" : "end", dx, dy),
+        );
+        return;
       } else {
         if (drag.mode.includes("w")) {
           const maxDelta = start.width - MIN_SIZE_MM;
@@ -249,6 +264,8 @@ export default function CardCanvas({
         return (
           <div
             key={field.id}
+            aria-label={editable ? field.label : undefined}
+            data-field-id={field.id}
             role={editable ? "button" : undefined}
             tabIndex={editable ? 0 : undefined}
             className={cx(
@@ -260,7 +277,20 @@ export default function CardCanvas({
             style={boxStyle(field, pxPerMm)}
             onPointerDown={(e) => startDrag(e, field, "move")}
           >
-            {field.type === "image" ? (
+            {field.type === "line" ? (
+              <>
+                <div
+                  className="pointer-events-none absolute inset-0"
+                  style={{ backgroundColor: field.style.color }}
+                />
+                {editable ? (
+                  <div
+                    className="absolute left-0 top-1/2 w-full -translate-y-1/2"
+                    style={{ height: Math.max(field.layout.height * pxPerMm, 14), touchAction: "none" }}
+                  />
+                ) : null}
+              </>
+            ) : field.type === "image" ? (
               raw ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={raw} alt={field.label} style={imageStyle(field)} draggable={false} />
@@ -289,7 +319,24 @@ export default function CardCanvas({
               </div>
             )}
 
-            {selected && !field.locked
+            {selected && !field.locked && field.type === "line" ? (
+              (["start", "end"] as const).map((endpoint) => (
+                <span
+                  key={endpoint}
+                  role="button"
+                  aria-label={`Stretch line ${endpoint}`}
+                  className="field-handle"
+                  style={{
+                    left: endpoint === "start" ? -5 : undefined,
+                    right: endpoint === "end" ? -5 : undefined,
+                    top: "calc(50% - 5px)",
+                    cursor: "crosshair",
+                    touchAction: "none",
+                  }}
+                  onPointerDown={(e) => startDrag(e, field, `line-${endpoint}`)}
+                />
+              ))
+            ) : selected && !field.locked
               ? HANDLES.map((handle) => (
                   <span
                     key={handle.mode}

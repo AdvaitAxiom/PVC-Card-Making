@@ -140,8 +140,8 @@ export async function deleteCard(id: string): Promise<void> {
 export async function createCardFromTemplate(template: CardTemplate): Promise<CardRecord> {
   const values: Record<string, string> = {};
   for (const field of template.fields) {
-    // Image defaults stay on the template so they are not copied into every card.
-    if (field.defaultValue && field.type !== "image") values[field.key] = field.defaultValue;
+    // Only text needs a per-card value; pictures and lines stay on the template.
+    if (field.defaultValue && field.type === "text") values[field.key] = field.defaultValue;
   }
   const card: CardRecord = {
     id: uid("card"),

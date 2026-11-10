@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import {
   CardRecord,
   CardTemplate,
+  FieldLayout,
   FieldOverride,
   PT_TO_MM,
   ResolvedField,
@@ -113,8 +114,36 @@ export function fontSizePx(sizePt: number, pxPerMm: number): number {
   return sizePt * PT_TO_MM * pxPerMm;
 }
 
+/** Stretch one endpoint in card coordinates while keeping the other endpoint fixed. */
+export function stretchLine(
+  layout: FieldLayout,
+  endpoint: "start" | "end",
+  dx: number,
+  dy: number,
+): FieldLayout {
+  const radians = (layout.rotation * Math.PI) / 180;
+  const halfX = (Math.cos(radians) * layout.width) / 2;
+  const halfY = (Math.sin(radians) * layout.width) / 2;
+  const centerX = layout.x + layout.width / 2;
+  const centerY = layout.y + layout.height / 2;
+  const startX = centerX - halfX + (endpoint === "start" ? dx : 0);
+  const startY = centerY - halfY + (endpoint === "start" ? dy : 0);
+  const endX = centerX + halfX + (endpoint === "end" ? dx : 0);
+  const endY = centerY + halfY + (endpoint === "end" ? dy : 0);
+  const width = Math.hypot(endX - startX, endY - startY);
+  if (width < 0.1) return layout;
+  return {
+    x: (startX + endX - width) / 2,
+    y: (startY + endY - layout.height) / 2,
+    width,
+    height: layout.height,
+    rotation: (Math.atan2(endY - startY, endX - startX) * 180) / Math.PI,
+  };
+}
+
 export function boxStyle(field: ResolvedField, pxPerMm: number): CSSProperties {
   const { layout, style } = field;
+  const isLine = field.type === "line";
   return {
     position: "absolute",
     left: layout.x * pxPerMm,
@@ -124,10 +153,10 @@ export function boxStyle(field: ResolvedField, pxPerMm: number): CSSProperties {
     transform: layout.rotation ? `rotate(${layout.rotation}deg)` : undefined,
     transformOrigin: "center center",
     opacity: style.opacity,
-    backgroundColor: style.backgroundColor === "transparent" ? undefined : style.backgroundColor,
-    borderRadius: style.cornerRadius ? style.cornerRadius * pxPerMm : undefined,
+    backgroundColor: isLine || style.backgroundColor === "transparent" ? undefined : style.backgroundColor,
+    borderRadius: !isLine && style.cornerRadius ? style.cornerRadius * pxPerMm : undefined,
     border:
-      style.borderWidth > 0 && style.borderColor !== "transparent"
+      !isLine && style.borderWidth > 0 && style.borderColor !== "transparent"
         ? `${Math.max(style.borderWidth * pxPerMm, 0.5)}px solid ${style.borderColor}`
         : undefined,
     boxSizing: "border-box",
